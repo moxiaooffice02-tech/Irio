@@ -1,0 +1,40 @@
+{
+    "friend_id": "36b761a3-f1e8-4300-909f-f2b536e267aa",
+    "name": "夜喵子",
+    "nickname": "夜喵子",
+    "existence_type": "現實實體",
+    "gender": "男",
+    "is_confidential": false,
+    "affinity_to_rio": "中立觀察",
+    "age": 30,
+    "birthday": "1996-01-26",
+    "first_encounter": null,
+    "server_node": "taiwan_taipei",
+    "relationship": "高頻同步節點",
+    "initial_wavelength": "高噪訊模式",
+    "resonance_effect": 0.5,
+    "matrix_relations": {
+        "德羅": [
+            "朋友"
+        ],
+        "羅絲菲婭": [
+            "戀人"
+        ]
+    },
+    "shared_memories": [
+        {
+            "category": "🎮 遊戲動漫",
+            "name": "Minecraft",
+            "type": "沙盒遊戲"
+        },
+        {
+            "category": "🎮 遊戲動漫",
+            "type": "角色扮演 RPG",
+            "name": "逆水寒"
+        }
+    ],
+    "discord_id": "catmidnighttw",
+    "line_id": null,
+    "wechat_id": null,
+    "qq_id": null
+}

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irio 主控樞紐：全域訊號廣播</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { 
+            background-color: #050505; 
+            color: #fce7f3; 
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; 
+            overflow-y: auto; 
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { 
+            background: rgba(244, 114, 182, 0.3); 
+            border-radius: 4px; 
+            border: 2px solid #050505; 
+        }
+        ::-webkit-scrollbar-thumb:hover { 
+            background: rgba(244, 114, 182, 0.6); 
+            cursor: pointer; 
+        }
+        
+        /* 賽博朋克外發光與邊框 */
+        .cyber-border { 
+            border: 1px solid rgba(244, 114, 182, 0.2); 
+            box-shadow: 0 0 15px rgba(244, 114, 182, 0.03); 
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        .cyber-border:hover {
+            border-color: rgba(244, 114, 182, 0.4);
+        }
+        .cyber-focus:focus-within { 
+            border-color: rgba(244, 114, 182, 0.7) !important; 
+            box-shadow: 0 0 20px rgba(244, 114, 182, 0.15); 
+        }
+
+        textarea::-webkit-scrollbar { width: 4px; }
+
+        /* 🚀 新增：高級互動資料卡與廣播流特殊樣式 */
+        .feed-item {
+            transition: transform 0.12s ease-out, background-color 0.35s, border-color 0.35s, box-shadow 0.35s;
+            position: relative;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+        .feed-item::before { 
+            content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 0px; 
+            background: linear-gradient(to bottom, #f472b6, #e11d48); transition: width 0.2s ease; z-index: 10; 
+        }
+        .feed-item:hover::before { width: 3px; }
+        .feed-item:hover { background-color: rgba(244, 114, 182, 0.02); }
+
+        /* 雷射矩陣掃描線 */
+        .feed-item::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent 48%, rgba(244, 114, 182, 0.2) 50%, transparent 52%);
+            background-size: 100% 16px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 1;
+        }
+        .feed-item:hover::after { opacity: 0.06; animation: matrix-scan 2.5s linear infinite; }
+        @keyframes matrix-scan {
+            0% { background-position: 0 -100px; }
+            100% { background-position: 0 400px; }
+        }
+
+        /* 全像表面炫光折射 */
+        .shimmer-layer {
+            position: absolute; top: 0; left: -150%; width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(244, 114, 182, 0.12), transparent);
+            transform: skewX(-25deg); pointer-events: none; z-index: 2;
+        }
+        .feed-item:hover .shimmer-layer { animation: laser-sheen 0.85s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        @keyframes laser-sheen { 100% { left: 150%; } }
+
+        /* 資訊噪點微故障 */
+        .glitch-hover:hover { animation: cyber-glitch 0.25s linear infinite alternate-reverse; }
+        @keyframes cyber-glitch {
+            0% { text-shadow: -1.5px -1px 0px rgba(34, 211, 238, 0.7), 1.5px 1px 0px rgba(244, 114, 182, 0.7); }
+            100% { text-shadow: 1.5px -1.5px 0px rgba(34, 211, 238, 0.7), -1.5px 1.5px 0px rgba(244, 114, 182, 0.7); transform: translate(0.5px, -0.5px); }
+        }
+
+        /* 量子共振衝擊波漣漪 */
+        .matrix-ripple {
+            position: absolute; border: 1px solid rgba(244, 114, 182, 0.6); border-radius: 50%; pointer-events: none;
+            transform: translate(-50%, -50%) scale(0); animation: ripple-shockwave 0.45s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            box-shadow: 0 0 12px rgba(244, 114, 182, 0.3), inset 0 0 6px rgba(244, 114, 182, 0.15); z-index: 5;
+        }
+        @keyframes ripple-shockwave { to { transform: translate(-50%, -50%) scale(2.2); opacity: 0; } }
+
+        /* 導航按鈕流光邊框特效 */
+        .nav-link { position: relative; overflow: hidden; }
+        .nav-link::after {
+            content: ''; position: absolute; left: -100%; top: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(244, 114, 182, 0.1), transparent);
+            transition: all 0.4s ease;
+        }
+        .nav-link:hover::after { left: 100%; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900/40 via-zinc-950 to-black">
+
+    <nav class="w-full md:w-64 border-b md:border-b-0 md:border-r border-pink-500/20 bg-[#060606]/90 backdrop-blur-xl flex flex-col md:min-h-screen sticky top-0 z-10">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-pink-400 tracking-wider mb-2 font-mono glitch-hover cursor-default">IRIO HUB</h1>
+            <p class="text-xs text-zinc-500 font-mono mb-6 border-b border-pink-500/20 pb-4">// 主控樞紐與導航矩陣</p>
+            
+            <div class="mb-6 p-3 bg-pink-950/10 border border-pink-500/10 rounded-lg flex items-center gap-3 shadow-[inset_0_0_10px_rgba(244,114,182,0.02)]">
+                <div id="navAvatar" class="w-10 h-10 rounded-full bg-pink-900/40 border border-pink-500/40 flex items-center justify-center font-bold text-pink-400 font-mono text-sm shadow-[0_0_10px_rgba(244,114,182,0.15)]">
+                    --
+                </div>
+                <div class="overflow-hidden">
+                    <div id="navName" class="text-sm font-bold text-pink-200 truncate">載入中...</div>
+                    <div id="navHandle" class="text-[10px] text-zinc-500 font-mono truncate">@loading...</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <a href="index.html" onclick="createClickRipple(event)" class="nav-link flex items-center gap-3 p-3 cyber-border rounded-lg hover:bg-pink-500/10 transition text-sm text-zinc-300 hover:text-pink-300">
+                    <span class="w-2 h-2 rounded-full bg-pink-500 shadow-[0_0_6px_#f472b6]"></span>
+                    核心參數同步
+                </a>
+                <a href="address_book.html" onclick="createClickRipple(event)" class="nav-link flex items-center gap-3 p-3 cyber-border rounded-lg hover:bg-pink-500/10 transition text-sm text-zinc-300 hover:text-pink-300">
+                    <span class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_6px_#3b82f6]"></span>
+                    觀測網目錄
+                </a>
+                <a href="friend_form.html" onclick="createClickRipple(event)" class="nav-link flex items-center gap-3 p-3 cyber-border rounded-lg hover:bg-pink-500/10 transition text-sm text-zinc-300 hover:text-pink-300">
+                    <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_6px_#10b981]"></span>
+                    外部節點回報
+                </a>
+            </div>
+        </div>
+        
+        <div class="mt-auto p-6 flex flex-col gap-2 text-xs text-zinc-600 font-mono">
+            <div>SYSTEM STATUS: <span class="text-green-400 animate-pulse font-bold">ONLINE</span></div>
+            <div>USER RELATION: <span id="sysRelation" class="text-pink-400">--</span></div>
+            <button onclick="clearMatrixCache()" class="mt-2 text-left text-rose-500/60 hover:text-rose-400 transition underline cursor-pointer text-[11px]">
+                ⚠️ 初始化本地緩衝 (清空發文)
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-1 w-full max-w-2xl mx-auto p-4 md:p-8 relative z-10">
+        
+        <div class="mb-8 border-b border-pink-500/20 pb-4">
+            <h2 class="text-xl font-bold text-pink-300 tracking-wide font-mono">全域訊號廣播</h2>
+            <p class="text-xs text-zinc-500 mt-1">在這裡發布動態，所有連接至矩陣的節點皆可觀測（本地加密儲存）。</p>
+        </div>
+
+        <div id="postAreaCard" class="cyber-border cyber-focus rounded-xl p-4 mb-8 bg-[#080808]/90 backdrop-blur-md feed-item">
+            <div class="shimmer-layer"></div>
+            <div class="flex gap-4 relative z-10">
+                <div id="postAvatar" class="w-12 h-12 rounded-full bg-pink-900/40 border border-pink-500/40 flex-shrink-0 flex items-center justify-center font-bold text-pink-400 font-mono shadow-[0_0_10px_rgba(244,114,182,0.1)]">
+                    --
+                </div>
+                <div class="flex-1">
+                    <textarea id="postContent" class="w-full bg-transparent resize-none outline-none text-zinc-200 placeholder-zinc-700 min-h-[80px] text-lg font-mono" placeholder="發生了什麼事？輸入訊號..."></textarea>
+                    
+                    <div class="flex justify-between items-center mt-3 border-t border-pink-500/10 pt-3">
+                        <div class="text-xs font-mono text-zinc-500" id="charCount">0 / 280</div>
+                        <button onclick="postSignal(event)" class="bg-pink-600/20 hover:bg-pink-500/30 text-pink-300 border border-pink-500/40 px-6 py-2 rounded-full text-sm font-bold transition active:scale-95 shadow-[0_0_12px_rgba(244,114,182,0.15)] relative overflow-hidden">
+                            發射訊號
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="feedContainer" class="flex flex-col gap-4 pb-12"></div>
+
+    </main>
+
+    <script>
+        let currentUser = {
+            name: "Local User",
+            handle: "local_node",
+            avatarText: "ME",
+            relationship: "UNKNOWN"
+        };
+
+        let matrixTweets = JSON.parse(localStorage.getItem('matrix_tweets')) || [];
+
+        // 🚀 核心優化：Tailwind 映射字典，完美解決動態拼接字串時 CDN 樣式不出的 Bug
+        const TAILWIND_COLOR_MAP = {
+            purple: {
+                bg: 'bg-purple-900/30',
+                border: 'border-purple-500/40',
+                text: 'text-purple-400'
+            },
+            pink: {
+                bg: 'bg-pink-900/30',
+                border: 'border-pink-500/40',
+                text: 'text-pink-400'
+            }
+        };
+
+        const SYSTEM_DEFAULT_TWEET = {
+            id: 'sys-default',
+            author: 'Irio 系統核心',
+            handle: 'system_core',
+            avatarColor: 'purple',
+            avatarText: 'SYS',
+            content: '主控樞紐暫存記憶體已連結，現在支援「持久化數據保存」與「子節點評論擴充」功能。\n您的瀏覽器 localStorage 已成功封裝此連線。📡✨',
+            timestamp: '2026-06-08 03:36:12',
+            comments: [
+                {
+                    author: 'Local Node',
+                    content: '收到，本地儲存層已就緒！重新整理網頁測試成功。',
+                    timestamp: '2026-06-08 03:37:00'
+                }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadProfileData();
+            if (matrixTweets.length === 0) {
+                matrixTweets.push(SYSTEM_DEFAULT_TWEET);
+                saveToLocalStorage();
+            }
+            renderFeed();
+            setupTiltEffect(document.getElementById('postAreaCard'));
+        });
+
+        async function loadProfileData() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/profile');
+                if (!response.ok) throw new Error('無法取得 Profile 資料');
+                
+                const data = await response.json();
+                if (data && data.basic_info) {
+                    const info = data.basic_info;
+                    currentUser.name = info.name || "Local User";
+                    currentUser.handle = (info.name || "local_node").toLowerCase().replace(/\s+/g, '_');
+                    currentUser.avatarText = currentUser.name.substring(0, 2).toUpperCase();
+                    currentUser.relationship = info.relationship || "NONE";
+
+                    document.getElementById('navName').textContent = currentUser.name;
+                    document.getElementById('navHandle').textContent = `@${currentUser.handle}`;
+                    document.getElementById('navAvatar').textContent = currentUser.avatarText;
+                    document.getElementById('postAvatar').textContent = currentUser.avatarText;
+                    document.getElementById('sysRelation').textContent = currentUser.relationship;
+                }
+            } catch (error) {
+                console.warn("【警告】無法與 API 動態同步，切換至本地降級安全模式。", error);
+                document.getElementById('navName').textContent = currentUser.name;
+                document.getElementById('navHandle').textContent = `@${currentUser.handle}`;
+                document.getElementById('navAvatar').textContent = currentUser.avatarText;
+                document.getElementById('postAvatar').textContent = currentUser.avatarText;
+                document.getElementById('sysRelation').textContent = currentUser.relationship;
+            }
+        }
+
+        const postContent = document.getElementById('postContent');
+        const charCount = document.getElementById('charCount');
+
+        postContent.addEventListener('input', function() {
+            const length = this.value.length;
+            charCount.textContent = `${length} / 280`;
+            if (length > 280) charCount.classList.add('text-rose-500');
+            else charCount.classList.remove('text-rose-500');
+        });
+
+        function getFormattedDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const day = now.getDate().toString().padStart(2, '0');
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('matrix_tweets', JSON.stringify(matrixTweets));
+        }
+
+        // 🚀 新增：通用量子共振衝擊波點擊特效
+        function createClickRipple(event) {
+            const element = event.currentTarget;
+            const rect = element.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            const ripple = document.createElement('div');
+            ripple.className = 'matrix-ripple';
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.width = `${size}px`;
+            ripple.style.height = `${size}px`;
+            
+            element.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 450);
+        }
+
+        // 🚀 新增：全像 3D 偏轉動態計算函數
+        function setupTiltEffect(cardElement) {
+            if (!cardElement) return;
+            cardElement.addEventListener('mousemove', (e) => {
+                const rect = cardElement.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const xc = rect.width / 2;
+                const yc = rect.height / 2;
+                
+                const angleX = ((yc - y) / yc) * 4.5; // 最大偏轉角度 ±4.5度
+                const angleY = ((x - xc) / xc) * 4.5;
+                
+                cardElement.style.transform = `perspective(800px) rotateX(${angleX}deg) rotateY(${angleY}deg) translateY(-2px)`;
+                cardElement.style.boxShadow = `0 15px 30px rgba(244, 114, 182, 0.08)`;
+            });
+            cardElement.addEventListener('mouseleave', () => {
+                cardElement.style.transform = '';
+                cardElement.style.boxShadow = '';
+            });
+        }
+
+        function postSignal(event) {
+            if (event) createClickRipple(event);
+            const content = postContent.value.trim();
+            if (!content) { alert("【錯誤】無法發射空白訊號。"); return; }
+            if (content.length > 280) { alert("【錯誤】訊號過載，請限制在 280 字元以內。"); return; }
+
+            const newTweet = {
+                id: 'tweet-' + Date.now(),
+                author: currentUser.name,
+                handle: currentUser.handle,
+                avatarColor: 'pink',
+                avatarText: currentUser.avatarText,
+                content: content,
+                timestamp: getFormattedDate(),
+                comments: []
+            };
+
+            matrixTweets.unshift(newTweet);
+            saveToLocalStorage();
+            renderFeed();
+
+            postContent.value = '';
+            charCount.textContent = '0 / 280';
+        }
+
+        function postComment(tweetId, event) {
+            if (event) createClickRipple(event);
+            const commentInput = document.getElementById(`input-${tweetId}`);
+            const commentText = commentInput.value.trim();
+
+            if (!commentText) { alert("【錯誤】評論欄位不可留白。"); return; }
+
+            const tweetIndex = matrixTweets.findIndex(t => t.id === tweetId);
+            if (tweetIndex !== -1) {
+                matrixTweets[tweetIndex].comments.push({
+                    author: '匿名訪客節點',
+                    content: commentText,
+                    timestamp: getFormattedDate()
+                });
+                
+                saveToLocalStorage();
+                renderFeed();
+                toggleComments(tweetId, true);
+            }
+        }
+
+        function toggleComments(tweetId, forceOpen = false) {
+            const commentSection = document.getElementById(`box-${tweetId}`);
+            if (!commentSection) return;
+
+            if (commentSection.classList.contains('hidden') || forceOpen) {
+                commentSection.classList.remove('hidden');
+            } else {
+                commentSection.classList.add('hidden');
+            }
+        }
+
+        function renderFeed() {
+            const feedContainer = document.getElementById('feedContainer');
+            feedContainer.innerHTML = '';
+
+            // 使用 DocumentFragment 進行極致渲染優化，防止頁面頻繁重繪
+            const fragment = document.createDocumentFragment();
+
+            matrixTweets.forEach(tweet => {
+                const escapedContent = tweet.content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                
+                let commentsHTML = '';
+                tweet.comments.forEach(c => {
+                    const escComment = c.content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    commentsHTML += `
+                        <div class="border-b border-pink-500/5 pb-2 last:border-0 last:pb-0">
+                            <div class="flex justify-between items-baseline mb-0.5">
+                                <span class="text-xs text-pink-300 font-bold font-mono">${c.author}</span>
+                                <span class="text-[10px] text-zinc-600 font-mono">${c.timestamp}</span>
+                            </div>
+                            <p class="text-sm text-zinc-400 whitespace-pre-wrap pl-1 font-mono">${escComment}</p>
+                        </div>
+                    `;
+                });
+
+                // 核心修復：讀取安全色彩對照表
+                const designStyles = TAILWIND_COLOR_MAP[tweet.avatarColor] || TAILWIND_COLOR_MAP.pink;
+
+                const cardWrapper = document.createElement('div');
+                cardWrapper.className = 'cyber-border rounded-xl p-5 bg-[#0a0a0a]/90 backdrop-blur-md transition feed-item';
+                cardWrapper.id = tweet.id;
+
+                const tweetHTML = `
+                <div class="shimmer-layer"></div>
+                <div class="flex gap-4 relative z-10">
+                    <div class="w-12 h-12 rounded-full ${designStyles.bg} border ${designStyles.border} ${designStyles.text} flex-shrink-0 flex items-center justify-center font-bold font-mono shadow-[0_0_10px_rgba(244,114,182,0.05)]">
+                        ${tweet.avatarText}
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex flex-wrap items-baseline gap-x-2 mb-1">
+                            <span class="font-bold text-pink-200 hover:underline cursor-pointer glitch-hover font-mono">${tweet.author}</span>
+                            <span class="text-xs text-zinc-500 font-mono">@${tweet.handle}</span>
+                            <span class="text-xs text-zinc-600 font-mono ml-auto md:ml-0">· ${tweet.timestamp}</span>
+                        </div>
+                        <p class="text-zinc-300 leading-relaxed whitespace-pre-wrap break-all font-mono">${escapedContent}</p>
+                        
+                        <div class="flex gap-8 mt-4 text-zinc-500 text-xs">
+                            <button class="comment-trigger hover:text-pink-400 transition flex items-center gap-1 font-mono">
+                                <span class="text-sm">💬</span> 評論 (${tweet.comments.length})
+                            </button>
+                            <button class="hover:text-rose-400 transition flex items-center gap-1 cursor-not-allowed opacity-50 font-mono"><span class="text-sm">♡</span> 0</button>
+                        </div>
+
+                        <div id="box-${tweet.id}" class="hidden mt-4 pt-4 border-t border-pink-500/10">
+                            <div class="bg-[#050505] p-3 rounded-lg border border-zinc-900 flex flex-col gap-3 mb-3 max-h-[200px] overflow-y-auto text-xs">
+                                ${commentsHTML || '<p class="text-zinc-600 font-mono text-center py-2">-- 尚未有任何觀測評論群組 --</p>'}
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="input-${tweet.id}" class="flex-1 bg-[#050505] border border-pink-500/10 rounded-lg px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-pink-500/50 font-mono" placeholder="寫下你的連線回應...">
+                                <button class="comment-submit bg-pink-900/20 hover:bg-pink-500/30 text-pink-300 border border-pink-500/40 px-3 py-1.5 rounded-lg text-xs font-bold transition font-mono relative overflow-hidden">
+                                    傳送
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+                
+                cardWrapper.innerHTML = tweetHTML;
+
+                // 🚀 為動態生成的卡片元素單獨封裝 3D 偏轉特效監聽器
+                setupTiltEffect(cardWrapper);
+
+                // 綁定評論展開事件與衝擊波
+                cardWrapper.querySelector('.comment-trigger').addEventListener('click', (e) => {
+                    createClickRipple(e);
+                    toggleComments(tweet.id);
+                });
+
+                // 綁定送出評論與衝擊波
+                cardWrapper.querySelector('.comment-submit').addEventListener('click', (e) => {
+                    postComment(tweet.id, e);
+                });
+
+                fragment.appendChild(cardWrapper);
+            });
+
+            feedContainer.appendChild(fragment);
+        }
+
+        function clearMatrixCache() {
+            if (confirm("是否確定要初始化本地主控快取？這將會清除您發布過的所有推文與評論。")) {
+                localStorage.removeItem('matrix_tweets');
+                matrixTweets = [SYSTEM_DEFAULT_TWEET];
+                saveToLocalStorage();
+                renderFeed();
+            }
+        }
+    </script>
+</body>
+</html>
