@@ -1,0 +1,35 @@
+{
+    "friend_id": "c977b0d3",
+    "name": "WILSON",
+    "nickname": "小西餅",
+    "existence_type": "現實實體",
+    "gender": "男",
+    "is_confidential": false,
+    "affinity_to_rio": "中立觀察",
+    "age": 17,
+    "birthday": "2008-08-11",
+    "first_encounter": null,
+    "server_node": "taiwan_nantou",
+    "relationship": "高頻同步節點",
+    "initial_wavelength": "穩定共鳴",
+    "resonance_effect": 0.5,
+    "matrix_relations": {
+        "夜喵子": [
+            "朋友"
+        ],
+        "羅絲菲婭": [
+            "朋友"
+        ]
+    },
+    "shared_memories": [
+        {
+            "category": "🎮 遊戲動漫",
+            "type": "沙盒遊戲",
+            "name": "Minecraft"
+        }
+    ],
+    "discord_id": "wilson7374",
+    "line_id": null,
+    "wechat_id": null,
+    "qq_id": null
+}

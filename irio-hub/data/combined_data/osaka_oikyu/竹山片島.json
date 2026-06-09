@@ -1,0 +1,35 @@
+{
+    "friend_id": "2748186e-f990-40e0-a782-3c042bd12780",
+    "name": "竹山片島",
+    "nickname": "片島",
+    "existence_type": "虛擬存在",
+    "gender": "男",
+    "is_confidential": false,
+    "affinity_to_rio": "高度信賴",
+    "age": 21,
+    "birthday": "2005-04-08",
+    "first_encounter": null,
+    "server_node": "osaka_oikyu",
+    "relationship": "偶發性微弱連線",
+    "initial_wavelength": "微弱脈衝",
+    "resonance_effect": 0.2,
+    "matrix_relations": {
+        "竹山四季": [
+            "家人"
+        ],
+        "羅絲菲婭": [
+            "導師"
+        ]
+    },
+    "shared_memories": [
+        {
+            "category": "🍔 餐廳食記",
+            "type": "咖啡廳",
+            "name": "路易莎"
+        }
+    ],
+    "discord_id": null,
+    "line_id": null,
+    "wechat_id": null,
+    "qq_id": null
+}
