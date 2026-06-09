@@ -1,0 +1,32 @@
+{
+    "friend_id": "410ba3ae-8c78-4448-be68-57f1cafc9dc3",
+    "name": "德羅",
+    "nickname": "德羅",
+    "existence_type": "現實實體",
+    "gender": "男",
+    "is_confidential": true,
+    "affinity_to_rio": "中立觀察",
+    "age": 20,
+    "birthday": "2005-07-24",
+    "first_encounter": null,
+    "server_node": "taiwan_kaohsiung",
+    "relationship": "高頻同步節點",
+    "initial_wavelength": "穩定共鳴",
+    "resonance_effect": 0.5,
+    "matrix_relations": {
+        "夜喵子": [
+            "朋友"
+        ]
+    },
+    "shared_memories": [
+        {
+            "category": "🎮 遊戲動漫",
+            "type": "沙盒遊戲",
+            "name": "Minecraft"
+        }
+    ],
+    "discord_id": null,
+    "line_id": null,
+    "wechat_id": null,
+    "qq_id": null
+}
